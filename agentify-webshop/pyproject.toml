@@ -1,0 +1,20 @@
+[project]
+name = "agentify-webshop"
+version = "0.1.0"
+description = "Agentified WebShop Benchmark"
+requires-python = ">=3.10"
+dependencies = [
+    "a2a-sdk",
+    "uvicorn>=0.20.0",
+    "python-dotenv>=1.0.0",
+    "litellm>=1.0.0",
+    "bs4",
+    "gym==0.21.0", 
+    "requests",
+    "numpy"
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+]
