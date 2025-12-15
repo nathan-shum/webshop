@@ -1,0 +1,4 @@
+Warning: Could not import WebAgentTextEnv. Error: No module named 'faiss'
+sys.path: ['/Users/nathanshum/Desktop/webshop/agentify-webshop-white', '/opt/miniconda3/envs/webshop-py313/lib/python313.zip', '/opt/miniconda3/envs/webshop-py313/lib/python3.13', '/opt/miniconda3/envs/webshop-py313/lib/python3.13/lib-dynload', '/opt/miniconda3/envs/webshop-py313/lib/python3.13/site-packages', '/Users/nathanshum/Desktop/webshop/agentify-webshop/src', '/Users/nathanshum/Desktop/webshop/webshop-benchmark']
+Starting white agent on 0.0.0.0:38146...
+INFO:     127.0.0.1:58105 - "GET /.well-known/agent-card.json HTTP/1.1" 200 OK

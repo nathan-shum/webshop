@@ -1,0 +1,29 @@
+name = "webshop_green_agent"
+description = "The assessment hosting agent for WebShop."
+version = "0.1.0"
+
+defaultInputModes = ["text"]
+defaultOutputModes = ["text"]
+[capabilities]
+streaming = false
+
+[[skills]]
+id = "host_assess_webshop"
+name = "WebShop assessment hosting"
+description = """
+Assess the shopping ability of an agent.
+"""
+tags = ["green agent", "assessment hosting", "webshop"]
+examples = ["""    
+Your task is to instantiate webshop to test the agent located at:
+<white_agent_url>
+http://localhost:9002/
+</white_agent_url>
+You should use the following env configuration:
+<env_config>
+{
+  "num_products": 1000,
+  "human_goals": true
+}
+</env_config>
+    """]

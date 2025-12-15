@@ -1,0 +1,42 @@
+{
+  "additionalInterfaces": null,
+  "capabilities": {
+    "extensions": null,
+    "pushNotifications": null,
+    "stateTransitionHistory": null,
+    "streaming": null
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "description": "Test agent for WebShop",
+  "documentationUrl": null,
+  "iconUrl": null,
+  "name": "webshop_white_agent",
+  "preferredTransport": "JSONRPC",
+  "protocolVersion": "0.3.0",
+  "provider": null,
+  "security": null,
+  "securitySchemes": null,
+  "signatures": null,
+  "skills": [
+    {
+      "description": "Handles shopping requests",
+      "examples": [],
+      "id": "shopping_fulfillment",
+      "inputModes": null,
+      "name": "Shopping Fulfillment",
+      "outputModes": null,
+      "security": null,
+      "tags": [
+        "general"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": null,
+  "url": "http://0.0.0.0:8011/to_agent/77659f8185484752a591adb523226fce",
+  "version": "1.0.0"
+}

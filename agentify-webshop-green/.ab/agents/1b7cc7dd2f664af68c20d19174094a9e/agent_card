@@ -1,0 +1,46 @@
+{
+  "additionalInterfaces": null,
+  "capabilities": {
+    "extensions": null,
+    "pushNotifications": null,
+    "stateTransitionHistory": null,
+    "streaming": false
+  },
+  "defaultInputModes": [
+    "text"
+  ],
+  "defaultOutputModes": [
+    "text"
+  ],
+  "description": "The assessment hosting agent for WebShop.",
+  "documentationUrl": null,
+  "iconUrl": null,
+  "name": "webshop_green_agent",
+  "preferredTransport": "JSONRPC",
+  "protocolVersion": "0.3.0",
+  "provider": null,
+  "security": null,
+  "securitySchemes": null,
+  "signatures": null,
+  "skills": [
+    {
+      "description": "Assess the shopping ability of an agent.\n",
+      "examples": [
+        "    \nYour task is to instantiate webshop to test the agent located at:\n<white_agent_url>\nhttp://localhost:9002/\n</white_agent_url>\nYou should use the following env configuration:\n<env_config>\n{\n  \"num_products\": 1000,\n  \"human_goals\": true\n}\n</env_config>\n    "
+      ],
+      "id": "host_assess_webshop",
+      "inputModes": null,
+      "name": "WebShop assessment hosting",
+      "outputModes": null,
+      "security": null,
+      "tags": [
+        "green agent",
+        "assessment hosting",
+        "webshop"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": null,
+  "url": "http://0.0.0.0:8010/to_agent/1b7cc7dd2f664af68c20d19174094a9e",
+  "version": "0.1.0"
+}
