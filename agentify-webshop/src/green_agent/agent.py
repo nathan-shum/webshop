@@ -177,6 +177,9 @@ class WebShopGreenAgentExecutor(AgentExecutor):
         raise NotImplementedError
 
 def start_green_agent(agent_name="webshop_green_agent", host="localhost", port=9001):
+    host = os.getenv("HOST", host)
+    port = int(os.getenv("AGENT_PORT", port))
+    agent_url = os.getenv("AGENT_URL", f"http://{host}:{port}")
     print(f"Starting green agent on {host}:{port}...")
     # We might not have the toml file created yet, so let's mock it or create it
     try:
@@ -193,8 +196,7 @@ def start_green_agent(agent_name="webshop_green_agent", host="localhost", port=9
             "skills": []
         }
         
-    url = f"http://{host}:{port}"
-    agent_card_dict["url"] = url
+    agent_card_dict["url"] = agent_url
 
     request_handler = DefaultRequestHandler(
         agent_executor=WebShopGreenAgentExecutor(),

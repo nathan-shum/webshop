@@ -52,7 +52,7 @@ class WebShopWhiteAgentExecutor(AgentExecutor):
         if context.context_id not in self.ctx_id_to_chat:
             # Initialize Gemini model with system instruction
             model = genai.GenerativeModel(
-                model_name="gemini-2.5-pro",
+                model_name="gemini-2.5-flash-lite",
                 system_instruction="You are a helpful shopping assistant. You interact with a WebShop environment. Always output your action in JSON format: {\"action\": \"...\"} inside <json> tags."
             )
             self.ctx_id_to_chat[context.context_id] = model.start_chat(history=[])
@@ -75,9 +75,11 @@ class WebShopWhiteAgentExecutor(AgentExecutor):
         raise NotImplementedError
 
 def start_white_agent(agent_name="webshop_white_agent", host="localhost", port=9002):
+    host = os.getenv("HOST", host)
+    port = int(os.getenv("AGENT_PORT", port))
+    agent_url = os.getenv("AGENT_URL", f"http://{host}:{port}")
     print(f"Starting white agent on {host}:{port}...")
-    url = f"http://{host}:{port}"
-    card = prepare_white_agent_card(url)
+    card = prepare_white_agent_card(agent_url)
 
     request_handler = DefaultRequestHandler(
         agent_executor=WebShopWhiteAgentExecutor(),
