@@ -4,6 +4,7 @@ import uvicorn
 import dotenv
 import json
 import os
+import asyncio
 import google.generativeai as genai
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
@@ -59,13 +60,44 @@ class WebShopWhiteAgentExecutor(AgentExecutor):
             
         chat = self.ctx_id_to_chat[context.context_id]
 
-        # Call Gemini
-        try:
-            response = chat.send_message(user_input)
-            content = response.text
-        except Exception as e:
-            content = f"Error generating response: {e}"
-            print(f"Gemini Error: {e}")
+        # Rate Limiting: Proactive delay to avoid burning out free tier quota (approx 15 RPM limit)
+        print("White Agent: Waiting 5s to respect rate limits...")
+        await asyncio.sleep(5)
+
+        # Call Gemini with retries
+        max_retries = 10
+        base_delay = 5
+        content = ""
+        
+        for attempt in range(max_retries):
+            try:
+                # chat.send_message is synchronous in this library version, but we are in an async function.
+                # Ideally run in executor, but simple blocking here with async sleep is "okay" for this level of agent.
+                response = chat.send_message(user_input)
+                content = response.text
+                break
+            except Exception as e:
+                error_str = str(e)
+                print(f"Gemini Error (Attempt {attempt+1}/{max_retries}): {error_str}")
+                
+                # Check for rate limit or quota issues
+                if "429" in error_str or "quota" in error_str.lower():
+                    if attempt < max_retries - 1:
+                        wait_time = base_delay * (2 ** attempt)
+                        print(f"Rate limited. Waiting {wait_time}s before retry...")
+                        await asyncio.sleep(wait_time)
+                        continue
+                
+                # If not a rate limit, or out of retries, fail gracefully
+                content = f"Error generating response: {e}"
+                if attempt == max_retries - 1:
+                    print("Max retries reached. Giving up.")
+                else:
+                    # For non-rate-limit errors, maybe we shouldn't retry? 
+                    # But often transient network errors happen too. Let's retry carefully.
+                    wait_time = 2
+                    await asyncio.sleep(wait_time)
+
 
         await event_queue.enqueue_event(
             new_agent_text_message(content, context_id=context.context_id)

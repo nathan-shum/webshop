@@ -10,6 +10,9 @@ import json
 import time
 import sys
 import os
+import random
+import pathlib
+from datetime import datetime
 
 # Ensure webshop benchmark is in path so we can import its modules
 # Adjust this path if the user runs from a different location
@@ -30,9 +33,10 @@ from src.my_util import parse_tags, send_message
 try:
     from web_agent_site.envs import WebAgentTextEnv
 except ImportError as e:
-    print(f"Warning: Could not import WebAgentTextEnv. Error: {e}")
-    # Also try printing sys.path
+    print(f"CRITICAL ERROR: Could not import WebAgentTextEnv. Error: {e}")
     print(f"sys.path: {sys.path}")
+    # We cannot proceed without the environment
+    raise e
 
 dotenv.load_dotenv()
 
@@ -41,10 +45,22 @@ def load_agent_card_toml(agent_name):
     with open(f"{current_dir}/{agent_name}.toml", "rb") as f:
         return tomllib.load(f)
 
-async def ask_agent_to_solve(white_agent_url, env, max_num_steps=50):
+async def ask_agent_to_solve(white_agent_url, env, max_num_steps=50, seed=None):
     total_cost = 0.0
     # Reset env to get initial observation and instruction
-    obs, _ = env.reset()
+    # Deterministic Seeding: Attempt to seed the environment for reproducibility
+    if seed is not None:
+        print(f"Green agent: Setting evaluation seed to {seed}")
+        try:
+            # Standard Gym API
+            obs, _ = env.reset(seed=seed)
+        except TypeError:
+            # Fallback for environments that rely on global random state
+            random.seed(seed)
+            obs, _ = env.reset()
+    else:
+        obs, _ = env.reset()
+
     instruction = env.instruction_text
     
     # Construct initial task description for the white agent
@@ -129,7 +145,9 @@ Please provide your next action in <json> tags.
         "success": reward == 1.0,
         "reward": reward,
         "steps": step + 1,
-        "history": history
+        "efficiency": reward / (step + 1),  # Process Metric: Reward per step
+        "history": history,
+        "goal": instruction
     }
 
 class WebShopGreenAgentExecutor(AgentExecutor):
@@ -147,6 +165,7 @@ class WebShopGreenAgentExecutor(AgentExecutor):
             return
 
         env_config = json.loads(env_config_str)
+        seed = env_config.get("seed", None)
         
         print("Green agent: Setting up WebShop environment...")
         # Initialize WebShop Env
@@ -161,10 +180,20 @@ class WebShopGreenAgentExecutor(AgentExecutor):
         print("Green agent: Starting evaluation...")
         timestamp_started = time.time()
         
-        metrics = await ask_agent_to_solve(white_agent_url, env)
+        metrics = await ask_agent_to_solve(white_agent_url, env, seed=seed)
         
         metrics["time_used"] = time.time() - timestamp_started
         result_emoji = "✅" if metrics["success"] else "❌"
+        
+        # Trace Logging: Save the full interaction history to a file
+        log_dir = pathlib.Path("logs")
+        log_dir.mkdir(parents=True, exist_ok=True)
+        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_filename = log_dir / f"trace_{timestamp_str}.json"
+        
+        with open(log_filename, "w") as f:
+            json.dump(metrics, f, indent=2)
+        print(f"Green agent: Trace logged to {log_filename}")
         
         print("Green agent: Evaluation complete.")
         await event_queue.enqueue_event(
