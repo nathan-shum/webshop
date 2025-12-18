@@ -1,0 +1,27 @@
+a2a-sdk[http-server]
+earthshaker>=0.1.12
+uvicorn>=0.38.0
+python-dotenv>=1.2.0
+pydantic-settings>=2.11.0
+typer>=0.20.0
+google-generativeai
+fastapi
+httpx
+gym==0.26.2
+spacy==3.8.11
+thefuzz
+cleantext
+unidecode
+flask
+selenium
+pyserini==0.17.0
+torch
+numpy<2
+pillow
+bs4
+lxml
+html5lib
+requests
+
+[:python_version < "3.11"]
+tomli

@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "reward": 1.0,
+  "steps": 5,
+  "efficiency": 0.2,
+  "history": [
+    [
+      "search[orange cargo pants hiking]",
+      0.0
+    ],
+    [
+      "click[B099231V35]",
+      0.0
+    ],
+    [
+      "click[orange]",
+      0.0
+    ],
+    [
+      "click[large]",
+      0.0
+    ],
+    [
+      "click[Buy Now]",
+      1.0
+    ]
+  ],
+  "goal": "Instruction: hello, i'm looking for a pair of cargo pants for everyday casual wear? but also hiking-friendly. also, i want an orange pair please, and price lower than 50.00 dollars",
+  "time_used": 31.8117938041687
+}

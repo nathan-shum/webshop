@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/launcher.py
+src/agentify_webshop.egg-info/PKG-INFO
+src/agentify_webshop.egg-info/SOURCES.txt
+src/agentify_webshop.egg-info/dependency_links.txt
+src/agentify_webshop.egg-info/requires.txt
+src/agentify_webshop.egg-info/top_level.txt
+src/green_agent/__init__.py
+src/green_agent/agent.py
+src/my_util/__init__.py
+src/white_agent/__init__.py
+src/white_agent/agent.py

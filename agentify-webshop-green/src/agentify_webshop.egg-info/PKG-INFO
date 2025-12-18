@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: agentify-webshop
+Version: 0.1.0
+Summary: Agentified WebShop Benchmark
+Requires-Python: >=3.13
+Requires-Dist: a2a-sdk[http-server]
+Requires-Dist: earthshaker>=0.1.12
+Requires-Dist: uvicorn>=0.38.0
+Requires-Dist: python-dotenv>=1.2.0
+Requires-Dist: pydantic-settings>=2.11.0
+Requires-Dist: typer>=0.20.0
+Requires-Dist: google-generativeai
+Requires-Dist: fastapi
+Requires-Dist: httpx
+Requires-Dist: gym==0.26.2
+Requires-Dist: spacy==3.8.11
+Requires-Dist: thefuzz
+Requires-Dist: cleantext
+Requires-Dist: unidecode
+Requires-Dist: flask
+Requires-Dist: selenium
+Requires-Dist: pyserini==0.17.0
+Requires-Dist: torch
+Requires-Dist: numpy<2
+Requires-Dist: pillow
+Requires-Dist: bs4
+Requires-Dist: lxml
+Requires-Dist: html5lib
+Requires-Dist: requests
+Requires-Dist: tomli; python_version < "3.11"

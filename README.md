@@ -4,7 +4,7 @@ This repository contains the "Agentified" version of the WebShop benchmark, desi
 
 It consists of:
 - **Green Agent (Assessor):** Evaluates the performance of other agents on WebShop tasks.
-- **White Agent (Baseline):** A baseline agent using Google Gemini (`gemini-1.5-pro`) to perform shopping tasks.
+- **White Agent (Baseline):** A baseline agent using Google Gemini (`gemini-flash-latest`) to perform shopping tasks.
 - **Launcher:** A script to orchestrate the assessment locally.
 
 ## Prerequisites

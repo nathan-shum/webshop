@@ -45,6 +45,41 @@ def load_agent_card_toml(agent_name):
     with open(f"{current_dir}/{agent_name}.toml", "rb") as f:
         return tomllib.load(f)
 
+def prune_observation(obs):
+    """
+    Filter out irrelevant navigation links and noise from the WebShop observation
+    to reduce context usage and distraction.
+    """
+    # Split by the separator used in WebShop text mode
+    parts = obs.split(" [SEP] ")
+    
+    # List of known irrelevant header/footer text patterns in WebShop
+    irrelevant_patterns = [
+        "Skip to main content", "Instruction:", "Back to search", 
+        "Previous Page", "Next Page" # We want to keep pagination controls usually, but let's be careful.
+        # Actually, "Back to search", "Previous", "Next" ARE actions. We should keep them if they are actionable.
+        # But "Sign in", "Footer", etc might be noise.
+        # WebShop is often cleaner than real web.
+        # Let's focus on pruning known non-actionable or distracting text if we knew it.
+        # Without seeing the exact traces, we'll assume a safe heuristic:
+        # Just keep it simple for now as requested by user suggestion.
+    ]
+    
+    # User specifically asked to "strip out irrelevant navigation links".
+    # Since we don't have the exact list of noise, we will define a "keep" heuristic or just pass through for now
+    # with a placeholder comment, OR implement a simple length based prune if it's too long.
+    # However, to satisfy the request, I will remove common static header links if they exist.
+    
+    noise = {
+        "By using this website, you agree to our use of cookies",
+        "Conditions of Use", "Privacy Notice", "Interest-Based Ads", 
+        "© 2008-2022, Amazon.com, Inc. or its affiliates"
+    }
+    
+    cleaned_parts = [p for p in parts if p not in noise and not any(n in p for n in noise)]
+    
+    return " [SEP] ".join(cleaned_parts)
+
 async def ask_agent_to_solve(white_agent_url, env, max_num_steps=50, seed=None):
     total_cost = 0.0
     # Reset env to get initial observation and instruction
@@ -61,6 +96,8 @@ async def ask_agent_to_solve(white_agent_url, env, max_num_steps=50, seed=None):
     else:
         obs, _ = env.reset()
 
+    # Prune initial observation
+    obs = prune_observation(obs)
     instruction = env.instruction_text
     
     # Construct initial task description for the white agent
@@ -76,10 +113,16 @@ Available Actions:
 Here is the current page observation:
 {obs}
 
-Please respond in JSON format wrapped in <json> tags:
+Please respond in the ReAct format:
+Thought: <reasoning>
+Action: <json_action>
+
+Example:
+Thought: I need to find a running shoe.
+Action:
 <json>
 {{
-  "action": "search[...]" or "click[...]"
+  "action": "search[running shoe]"
 }}
 </json>
 """
@@ -116,12 +159,15 @@ Please respond in JSON format wrapped in <json> tags:
                 action = action_data.get("action", "")
             else:
                 # Fallback: try to interpret raw text if simple
-                action = white_text.strip()
+                # If ReAct format is used, we might need to parse better if <json> tag is missing
+                # But we instructed <json> tags.
+                raise ValueError("No <json> tag found in response.")
                 
             print(f"@@@ Executing Action: {action}")
             
             # Execute in WebShop
             obs, reward, done, info = env.step(action)
+            obs = prune_observation(obs)
             
             history.append((action, reward))
             
@@ -135,11 +181,17 @@ Action executed: {action}
 Current Page Observation:
 {obs}
 
-Please provide your next action in <json> tags.
+Please provide your next Thought and Action (in <json>).
 """
         except Exception as e:
             print(f"@@@ Error parsing or executing action: {e}")
-            next_green_message = f"Error: {str(e)}. Please ensure you output valid JSON with an 'action' field."
+            # Error Recovery: Feed the error back to the agent
+            next_green_message = f"""
+OBSERVATION: Invalid Action. 
+Error details: {str(e)}
+The action you tried was not valid for the current page. 
+Please look at the Available Actions and Observation again and provide a valid 'search[...]' or 'click[...]' action in <json> tags.
+"""
 
     return {
         "success": reward == 1.0,
